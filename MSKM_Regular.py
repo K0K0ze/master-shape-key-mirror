@@ -144,6 +144,7 @@ class MSKM_Regular(bpy.types.Operator):
 
 
         ##DRIVER-DEFINING##
+        NoDrivers = 0
         #Gets a list of all the shape keys that have a driver
         driver_shape_key_name_list = []
         try:
