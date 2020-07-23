@@ -50,6 +50,9 @@ class MSKM_Split(bpy.types.Operator):
         initial_mode = bpy.context.mode
         bpy.ops.object.mode_set(mode='OBJECT')
 
+        #Defines the active object name
+        active_object_name = bpy.context.active_object.name
+
         #Defines the initial shape key lock status and turns it on
         initial_shape_key_lock = bpy.context.object.show_only_shape_key
         bpy.context.object.show_only_shape_key = True
@@ -106,6 +109,9 @@ class MSKM_Split(bpy.types.Operator):
         #Defines the suffix side names
         Left = ["_L", "_l", ".L", ".l", custom_left]
         Right = ["_R", "_r", ".R", ".r", custom_right]
+
+        #Removes all the drivers from the selected shape keys
+        bpy.data.meshes[active_object_name].shape_keys.key_blocks[selected_shape_key_name].driver_remove('value')
 
 
         ##SPLITTING#
@@ -232,5 +238,5 @@ class MSKM_Split(bpy.types.Operator):
 
 
         #Speedtest END
-        print("MSKM Split finished: %.4f sec" % (time.time() - time_start))
+        print("#####","MSKM Split finished: %.4f sec" % (time.time() - time_start),"#####")
         return {'FINISHED'}
