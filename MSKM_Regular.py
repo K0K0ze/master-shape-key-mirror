@@ -417,9 +417,9 @@ class MSKM_Regular(bpy.types.Operator):
 
             y += 1
 
-        print("Copied:",SKD_type,SKD_expression,SKD_self)
-        print("Copied:",variables_list)
-        print(y)
+        #print("Copied:",SKD_type,SKD_expression,SKD_self)
+        #print("Copied:",variables_list)
+        #print(y)
 
 
 
