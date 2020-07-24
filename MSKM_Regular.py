@@ -147,18 +147,22 @@ class MSKM_Regular(bpy.types.Operator):
         NoDrivers = 0
         #Gets a list of all the shape keys that have a driver
         driver_shape_key_name_list = []
-        try:
-            for x in bpy.context.object.active_shape_key.id_data.animation_data.drivers:
-                #Hacky because I don't know how to get just the raw names so I used .replace
-                name = x.data_path.replace('key_blocks["',"").replace('"].value',"")
-                driver_shape_key_name_list.append(name)
-        except:
-            NoDrivers = 1
+        for x in bpy.context.object.active_shape_key.id_data.animation_data.drivers:
+            #Hacky because I don't know how to get just the raw names so I used .replace
+            name = x.data_path.replace('key_blocks["',"").replace('"].value',"")
+            driver_shape_key_name_list.append(name)
             
+
+        #Gets a index of the driver shape key, and the first part of the driver properties
+        if selected_shape_key_name not in driver_shape_key_name_list:
+            NoDrivers = 1
+            print("nope")
+        print("yeah")
+
+
         if NoDrivers == 1:
             pass
         else:
-            #Gets a index of the driver shape key, and the first part of the driver properties
             shape_key_driver_index = driver_shape_key_name_list.index(selected_shape_key_name)
             drv_sk = bpy.data.shape_keys[selected_shape_key_collection].id_data.animation_data.drivers[shape_key_driver_index]
 
@@ -230,9 +234,8 @@ class MSKM_Regular(bpy.types.Operator):
 
                     list_output = '["' + list_output + '"]'
                     
-                    list1 = [SKD_id_type,SKD_id,list_output]
+                    list1 = [SKD_id_type,SKD_id,list_output,SKD_data_path_original]
                     list0.append(list1)
-                    list0.append(SKD_data_path_original)
 
 
                     variables_list.append(list0)
@@ -423,7 +426,7 @@ class MSKM_Regular(bpy.types.Operator):
                     variables_list.append(list0)
 
                 y += 1
-
+            driver_variable_count = y
             #print("Copied:",SKD_type,SKD_expression,SKD_self)
             #print("Copied:",variables_list)
             #print(y)
@@ -550,15 +553,23 @@ class MSKM_Regular(bpy.types.Operator):
                 pass
             else:
                 if driver_option == 'Ignore':
+                    i = [selected_shape_key_name]
+                    z = [-1]
+                else:
+                    i = [renamed_second_shape_key,selected_shape_key_name]
+                    z = [2,-1]
+                
+
+                y = 0
+                for w in i:
                     #Add driver to original
-                    driver_add = bpy.data.meshes[active_object_name].shape_keys.key_blocks[selected_shape_key_name].driver_add('value')
+                    driver_add = bpy.data.meshes[active_object_name].shape_keys.key_blocks[w].driver_add('value')
 
                     driver_add.driver.type = SKD_type
                     driver_add.driver.expression = SKD_expression
                     driver_add.driver.use_self = SKD_self
 
-
-                    for x in range(y):
+                    for x in range(driver_variable_count):
                         
                         if variables_list[x][0] == "SINGLE_PROP":
                             driver_add_new = driver_add.driver.variables.new()
@@ -566,7 +577,7 @@ class MSKM_Regular(bpy.types.Operator):
                             driver_add_new.type = variables_list[x][0]
                             driver_add_new.targets[0].id_type = variables_list[x][2][0]
                             driver_add_new.targets[0].id = variables_list[x][2][1]
-                            driver_add_new.targets[0].data_path = variables_list[x][2][2]
+                            driver_add_new.targets[0].data_path = variables_list[x][2][z[y]]
                     
                         elif variables_list[x][0] == "TRANSFORMS":
                             driver_add_new = driver_add.driver.variables.new()
@@ -574,11 +585,11 @@ class MSKM_Regular(bpy.types.Operator):
                             driver_add_new.type = variables_list[x][0]
                             if variables_list[x][2][0] == 1:
                                 driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][2]
+                                driver_add_new.targets[0].bone_target = variables_list[x][2][z[y]]
                                 driver_add_new.targets[0].transform_type = variables_list[x][2][3]
                                 driver_add_new.targets[0].transform_space = variables_list[x][2][4]
                             else:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
+                                driver_add_new.targets[0].id = variables_list[x][2][z[y]]
                                 driver_add_new.targets[0].transform_type = variables_list[x][2][2]
                                 driver_add_new.targets[0].transform_space = variables_list[x][2][3]
                         
@@ -588,15 +599,15 @@ class MSKM_Regular(bpy.types.Operator):
                             driver_add_new.type = variables_list[x][0]
                             if variables_list[x][2][0] == 1:
                                 driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][2]
+                                driver_add_new.targets[0].bone_target = variables_list[x][2][z[y]]
                             else:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
+                                driver_add_new.targets[0].id = variables_list[x][2][z[y]]
 
                             if variables_list[x][3][0] == 1:
                                 driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][2]
+                                driver_add_new.targets[1].bone_target = variables_list[x][3][z[y]]
                             else:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
+                                driver_add_new.targets[1].id = variables_list[x][3][z[y]]
 
                         elif variables_list[x][0] == "LOC_DIFF":
                             driver_add_new = driver_add.driver.variables.new()
@@ -605,160 +616,20 @@ class MSKM_Regular(bpy.types.Operator):
 
                             if variables_list[x][2][0] == 1:
                                 driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][2]
+                                driver_add_new.targets[0].bone_target = variables_list[x][2][z[y]]
                                 driver_add_new.targets[0].transform_space = variables_list[x][2][3]
                             else:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
+                                driver_add_new.targets[0].id = variables_list[x][2][z[y]]
                                 driver_add_new.targets[0].transform_space = variables_list[x][2][2]
 
                             if variables_list[x][3][0] == 1:
                                 driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][2]
+                                driver_add_new.targets[1].bone_target = variables_list[x][3][z[y]]
                                 driver_add_new.targets[1].transform_space = variables_list[x][3][3]
                             else:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
+                                driver_add_new.targets[1].id = variables_list[x][3][z[y]]
                                 driver_add_new.targets[1].transform_space = variables_list[x][3][2]
-
-                elif driver_option == 'Copy':
-                    #Add driver to original
-                    driver_add = bpy.data.meshes[active_object_name].shape_keys.key_blocks[selected_shape_key_name].driver_add('value')
-
-                    driver_add.driver.type = SKD_type
-                    driver_add.driver.expression = SKD_expression
-                    driver_add.driver.use_self = SKD_self
-
-
-                    for x in range(y):
-                        
-                        if variables_list[x][0] == "SINGLE_PROP":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-                            driver_add_new.targets[0].id_type = variables_list[x][2][0]
-                            driver_add_new.targets[0].id = variables_list[x][2][1]
-                            driver_add_new.targets[0].data_path = variables_list[x][2][-1:][0]
-                    
-                        elif variables_list[x][0] == "TRANSFORMS":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-                            if variables_list[x][2][0] == 1:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][-1:][0]
-                                driver_add_new.targets[0].transform_type = variables_list[x][2][3]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][4]
-                            else:
-                                driver_add_new.targets[0].id = variables_list[x][2][-1:][0]
-                                driver_add_new.targets[0].transform_type = variables_list[x][2][2]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][3]
-                        
-                        elif variables_list[x][0] == "ROTATION_DIFF":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-                            if variables_list[x][2][0] == 1:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][-1:][0]
-                            else:
-                                driver_add_new.targets[0].id = variables_list[x][2][-1:][0]
-
-                            if variables_list[x][3][0] == 1:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][-1:][0]
-                            else:
-                                driver_add_new.targets[1].id = variables_list[x][3][-1:][0]
-
-                        elif variables_list[x][0] == "LOC_DIFF":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-
-                            if variables_list[x][2][0] == 1:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][-1:][0]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][3]
-                            else:
-                                driver_add_new.targets[0].id = variables_list[x][2][-1:][0]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][2]
-
-                            if variables_list[x][3][0] == 1:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][-1:][0]
-                                driver_add_new.targets[1].transform_space = variables_list[x][3][3]
-                            else:
-                                driver_add_new.targets[1].id = variables_list[x][3][-1:][0]
-                                driver_add_new.targets[1].transform_space = variables_list[x][3][2]
-
-
-                    #Add driver to copy
-                    driver_add = bpy.data.meshes[active_object_name].shape_keys.key_blocks[renamed_second_shape_key].driver_add('value')
-
-                    driver_add.driver.type = SKD_type
-                    driver_add.driver.expression = SKD_expression
-                    driver_add.driver.use_self = SKD_self
-
-
-                    for x in range(y):
-                        
-                        if variables_list[x][0] == "SINGLE_PROP":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-                            driver_add_new.targets[0].id_type = variables_list[x][2][0]
-                            driver_add_new.targets[0].id = variables_list[x][2][1]
-                            driver_add_new.targets[0].data_path = variables_list[x][2][2]
-                    
-                        elif variables_list[x][0] == "TRANSFORMS":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-                            if variables_list[x][2][0] == 1:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][2]
-                                driver_add_new.targets[0].transform_type = variables_list[x][2][3]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][4]
-                            else:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].transform_type = variables_list[x][2][2]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][3]
-                        
-                        elif variables_list[x][0] == "ROTATION_DIFF":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-                            if variables_list[x][2][0] == 1:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][2]
-                            else:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-
-                            if variables_list[x][3][0] == 1:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][2]
-                            else:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
-
-                        elif variables_list[x][0] == "LOC_DIFF":
-                            driver_add_new = driver_add.driver.variables.new()
-                            driver_add_new.name = variables_list[x][1]
-                            driver_add_new.type = variables_list[x][0]
-
-                            if variables_list[x][2][0] == 1:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].bone_target = variables_list[x][2][2]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][3]
-                            else:
-                                driver_add_new.targets[0].id = variables_list[x][2][1]
-                                driver_add_new.targets[0].transform_space = variables_list[x][2][2]
-
-                            if variables_list[x][3][0] == 1:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][2]
-                                driver_add_new.targets[1].transform_space = variables_list[x][3][3]
-                            else:
-                                driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].transform_space = variables_list[x][3][2]
-
+                    y += 1
 
         #BATCH-MODE#
         if bpy.context.scene.my_tool.ManualBatch is True:
