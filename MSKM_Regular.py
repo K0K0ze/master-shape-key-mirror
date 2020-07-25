@@ -147,17 +147,19 @@ class MSKM_Regular(bpy.types.Operator):
         NoDrivers = 0
         #Gets a list of all the shape keys that have a driver
         driver_shape_key_name_list = []
-        for x in bpy.context.object.active_shape_key.id_data.animation_data.drivers:
-            #Hacky because I don't know how to get just the raw names so I used .replace
-            name = x.data_path.replace('key_blocks["',"").replace('"].value',"")
-            driver_shape_key_name_list.append(name)
+
+        if bpy.context.object.active_shape_key.id_data.animation_data is None:
+            pass
+        else:
+            for x in bpy.context.object.active_shape_key.id_data.animation_data.drivers:
+                #Hacky because I don't know how to get just the raw names so I used .replace
+                name = x.data_path.replace('key_blocks["',"").replace('"].value',"")
+                driver_shape_key_name_list.append(name)
             
 
         #Gets a index of the driver shape key, and the first part of the driver properties
         if selected_shape_key_name not in driver_shape_key_name_list:
             NoDrivers = 1
-            print("nope")
-        print("yeah")
 
 
         if NoDrivers == 1:
@@ -268,8 +270,11 @@ class MSKM_Regular(bpy.types.Operator):
                         driver_mirror_suffix()
                         list_output = driver_mirror_suffix()
 
-
-                        list_output = bpy.data.objects[list_output]
+                        try:
+                            list_output = bpy.data.objects[list_output]
+                        except:
+                            self.report({'ERROR'}, "Oi, oi, oi! the mirrored version of the object that drives the shape key doesn't exist.")
+                            return {'CANCELLED'} 
 
                         list1 = [0,list_output,SKD_transform_type,SKD_transform_space,drv_sk.driver.variables[y].targets[0].id]
 
@@ -428,7 +433,7 @@ class MSKM_Regular(bpy.types.Operator):
                 y += 1
             driver_variable_count = y
             #print("Copied:",SKD_type,SKD_expression,SKD_self)
-            #print("Copied:",variables_list)
+            print("Copied:",variables_list)
             #print(y)
 
 
@@ -554,24 +559,28 @@ class MSKM_Regular(bpy.types.Operator):
             else:
                 if driver_option == 'Ignore':
                     i = [selected_shape_key_name]
-                    z = [-1]
-                else:
+                elif driver_option == 'Copy':
                     i = [renamed_second_shape_key,selected_shape_key_name]
-                    z = [2,-1]
                 
 
                 y = 0
-                for w in i:
+                for item in i:
                     #Add driver to original
-                    driver_add = bpy.data.meshes[active_object_name].shape_keys.key_blocks[w].driver_add('value')
+                    driver_add = bpy.data.meshes[active_object_name].shape_keys.key_blocks[item].driver_add('value')
 
                     driver_add.driver.type = SKD_type
                     driver_add.driver.expression = SKD_expression
                     driver_add.driver.use_self = SKD_self
 
                     for x in range(driver_variable_count):
-                        
+
                         if variables_list[x][0] == "SINGLE_PROP":
+
+                            if driver_option == 'Ignore':
+                                z = [-1]
+                            elif driver_option == 'Copy':
+                                z = [2,-1]
+
                             driver_add_new = driver_add.driver.variables.new()
                             driver_add_new.name = variables_list[x][1]
                             driver_add_new.type = variables_list[x][0]
@@ -580,6 +589,16 @@ class MSKM_Regular(bpy.types.Operator):
                             driver_add_new.targets[0].data_path = variables_list[x][2][z[y]]
                     
                         elif variables_list[x][0] == "TRANSFORMS":
+
+                            if driver_option == 'Ignore':
+                                z = [-1]
+                            elif driver_option == 'Copy':
+                                if variables_list[x][2][0] == 1:
+                                    z = [2,-1]
+                                else:
+                                    z = [1,-1]
+
+
                             driver_add_new = driver_add.driver.variables.new()
                             driver_add_new.name = variables_list[x][1]
                             driver_add_new.type = variables_list[x][0]
@@ -593,7 +612,24 @@ class MSKM_Regular(bpy.types.Operator):
                                 driver_add_new.targets[0].transform_type = variables_list[x][2][2]
                                 driver_add_new.targets[0].transform_space = variables_list[x][2][3]
                         
+
+
                         elif variables_list[x][0] == "ROTATION_DIFF":
+
+                            if driver_option == 'Ignore':
+                                z = [-1]
+                                q = [-1]
+                            elif driver_option == 'Copy':
+                                if variables_list[x][2][0] == 1:
+                                    z = [2,-1]
+                                else:
+                                    z = [1,-1]
+
+                                if variables_list[x][3][0] == 1:
+                                    q = [2,-1]
+                                else:
+                                    q = [1,-1]
+
                             driver_add_new = driver_add.driver.variables.new()
                             driver_add_new.name = variables_list[x][1]
                             driver_add_new.type = variables_list[x][0]
@@ -605,11 +641,28 @@ class MSKM_Regular(bpy.types.Operator):
 
                             if variables_list[x][3][0] == 1:
                                 driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][z[y]]
+                                driver_add_new.targets[1].bone_target = variables_list[x][3][q[y]]
                             else:
-                                driver_add_new.targets[1].id = variables_list[x][3][z[y]]
+                                driver_add_new.targets[1].id = variables_list[x][3][q[y]]
+
+
 
                         elif variables_list[x][0] == "LOC_DIFF":
+
+                            if driver_option == 'Ignore':
+                                z = [-1]
+                                q = [-1]
+                            elif driver_option == 'Copy':
+                                if variables_list[x][2][0] == 1:
+                                    z = [2,-1]
+                                else:
+                                    z = [1,-1]
+
+                                if variables_list[x][3][0] == 1:
+                                    q = [2,-1]
+                                else:
+                                    q = [1,-1]
+
                             driver_add_new = driver_add.driver.variables.new()
                             driver_add_new.name = variables_list[x][1]
                             driver_add_new.type = variables_list[x][0]
@@ -624,11 +677,14 @@ class MSKM_Regular(bpy.types.Operator):
 
                             if variables_list[x][3][0] == 1:
                                 driver_add_new.targets[1].id = variables_list[x][3][1]
-                                driver_add_new.targets[1].bone_target = variables_list[x][3][z[y]]
+                                driver_add_new.targets[1].bone_target = variables_list[x][3][q[y]]
                                 driver_add_new.targets[1].transform_space = variables_list[x][3][3]
                             else:
-                                driver_add_new.targets[1].id = variables_list[x][3][z[y]]
+                                driver_add_new.targets[1].id = variables_list[x][3][q[y]]
                                 driver_add_new.targets[1].transform_space = variables_list[x][3][2]
+
+
+
                     y += 1
 
         #BATCH-MODE#
