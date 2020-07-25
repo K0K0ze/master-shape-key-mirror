@@ -433,7 +433,7 @@ class MSKM_Regular(bpy.types.Operator):
                 y += 1
             driver_variable_count = y
             #print("Copied:",SKD_type,SKD_expression,SKD_self)
-            print("Copied:",variables_list)
+            #print("Copied:",variables_list)
             #print(y)
 
 
@@ -548,6 +548,8 @@ class MSKM_Regular(bpy.types.Operator):
             bpy.ops.object.mode_set(mode='OBJECT')
 
 
+
+        #DRIVER-PASTING#
         if NoDrivers == 1:
             pass
         else:
@@ -686,6 +688,8 @@ class MSKM_Regular(bpy.types.Operator):
 
 
                     y += 1
+
+
 
         #BATCH-MODE#
         if bpy.context.scene.my_tool.ManualBatch is True:
