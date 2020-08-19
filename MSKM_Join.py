@@ -35,7 +35,7 @@ class MSKM_Join(bpy.types.Operator):
         ##ERROR CHECKER##
         #Reports a error for missing shape keys.
         if bpy.context.object.active_shape_key is None:
-            self.report({'ERROR'}, "The selected object does not have shape keys. The script dcollection not execute.")
+            self.report({'ERROR'}, "The selected object does not have shape keys. The script did not execute.")
             return {'CANCELLED'}
 
 
@@ -241,7 +241,7 @@ class MSKM_Join(bpy.types.Operator):
                 try:
                     x.name[y]
                 except:
-                    self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have a name")
+                    self.report({'ERROR'}, "Error! A driver variable doesn't have a name")
                     return {'CANCELLED'}    
 
 
@@ -252,14 +252,14 @@ class MSKM_Join(bpy.types.Operator):
                     try:
                         SKD_id = drv_sk.driver.variables[y].targets[0].id
                     except:
-                        self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have a prop ID")
+                        self.report({'ERROR'}, "Error! A driver variable doesn't have a prop ID")
                         return {'CANCELLED'} 
 
                     try:
                         SKD_data_path_original = drv_sk.driver.variables[y].targets[0].data_path
                         SKD_data_path = drv_sk.driver.variables[y].targets[0].data_path.split('["', 1)[1].split('"]', 1)[0]
                     except:
-                        self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have a data path")
+                        self.report({'ERROR'}, "Error! A driver variable doesn't have a data path")
                         return {'CANCELLED'} 
 
                     no_suffix_name = SKD_data_path[:-suffix_lenght]
@@ -289,7 +289,7 @@ class MSKM_Join(bpy.types.Operator):
                     try:
                         SKD_id = drv_sk.driver.variables[y].targets[0].id.name
                     except:
-                        self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have a object")
+                        self.report({'ERROR'}, "Error! A driver variable doesn't have a object")
                         return {'CANCELLED'} 
 
 
@@ -316,7 +316,7 @@ class MSKM_Join(bpy.types.Operator):
                             list_output = bpy.data.objects[list_output]
 
                         except:
-                            self.report({'ERROR'}, "Oi, oi, oi! the version of an object without the suffix doesn't exist")
+                            self.report({'ERROR'}, "Error! the version of an object without the suffix doesn't exist")
                             return {'CANCELLED'} 
 
                         list1 = [0,list_output,SKD_transform_type,SKD_transform_space,no_suffix_name,drv_sk.driver.variables[y].targets[0].id]
@@ -345,7 +345,7 @@ class MSKM_Join(bpy.types.Operator):
                     try:
                         SKD_id = drv_sk.driver.variables[y].targets[0].id.name
                     except:
-                        self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have the first object")
+                        self.report({'ERROR'}, "Error! A driver variable doesn't have the first object")
                         return {'CANCELLED'} 
                     
                     SKD_Object_type = (bpy.data.objects[SKD_id].type)
@@ -355,7 +355,7 @@ class MSKM_Join(bpy.types.Operator):
                     try:
                         SKD_id_second = drv_sk.driver.variables[y].targets[1].id.name
                     except:
-                        self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have the second object")
+                        self.report({'ERROR'}, "Error! A driver variable doesn't have the second object")
                         return {'CANCELLED'} 
                     
                     SKD_Object_type_second = (bpy.data.objects[SKD_id_second].type)
@@ -427,7 +427,7 @@ class MSKM_Join(bpy.types.Operator):
                     try:
                         SKD_id = drv_sk.driver.variables[y].targets[0].id.name
                     except:
-                        self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have the first object")
+                        self.report({'ERROR'}, "Error! A driver variable doesn't have the first object")
                         return {'CANCELLED'} 
 
                     SKD_Object_type = (bpy.data.objects[SKD_id].type)
@@ -437,7 +437,7 @@ class MSKM_Join(bpy.types.Operator):
                     try:
                         SKD_id_second = drv_sk.driver.variables[y].targets[1].id.name
                     except:
-                        self.report({'ERROR'}, "Oi, oi, oi! A driver variable doesn't have the second object")
+                        self.report({'ERROR'}, "Error! A driver variable doesn't have the second object")
                         return {'CANCELLED'} 
 
                     SKD_Object_type_second = (bpy.data.objects[SKD_id_second].type)

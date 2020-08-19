@@ -24,7 +24,7 @@ bl_info = {
     "location": "Properties > Object Data > Master Shape Key Mirror",
     "description": "Helps you with mirroring, splitting and joining shape keys",
     "warning": "I have no clue what I'm doing",
-    #"wiki_url": "",
+    "wiki_url": "https://github.com/K0K0ze/master-shape-key-mirror/wiki",
     "category": "Rigging",
     }
 
@@ -84,7 +84,7 @@ class MSKM_Radio(PropertyGroup):
 class MSKM_Checkbox(PropertyGroup):
     Doubling : BoolProperty(name = "Doubling", description = "Removes the doubling in the center produced by shape keys", default = True)
     KeepOriginal : BoolProperty(name = "KeepOriginal", description = "Keeps the original shape keys when using split and join", default = False)
-    Symmetrize : BoolProperty(name = "Symmetrize", description = "Symmetrizes the shape key", default = True)
+    Symmetrize : BoolProperty(name = "Symmetrize", description = "Symmetrizes the shape key", default = False)
     ManualBatch : BoolProperty(name = "ManualBatch", description = "Selects the next shape key in line after finishing", default = False)
     CustomSuffix : BoolProperty(name = "CustomSuffix", description = "Enables the custom user defined suffixes", default = False)
 
