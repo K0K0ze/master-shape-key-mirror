@@ -1,7 +1,7 @@
 # Master Shape Key Mirror
 A add-on for Blender that helps with the mirroring of shape keys. Drivers are not fully supported yet.
 
-Read the wiki: https://github.com/K0K0ze/master-shape-key-mirror/wiki 
+Read the <a href="https://github.com/K0K0ze/master-shape-key-mirror/wiki ">wiki</a>
 
 ### To do:
 
