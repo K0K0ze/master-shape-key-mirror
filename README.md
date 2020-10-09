@@ -3,7 +3,7 @@ A add-on for Blender that helps with the mirroring of shape keys. Drivers are no
 
 Read the wiki: https://github.com/K0K0ze/master-shape-key-mirror/wiki 
 
-### Done:
+### To do:
 
 - [x] mirror operator
 - [x] join operator
@@ -11,10 +11,6 @@ Read the wiki: https://github.com/K0K0ze/master-shape-key-mirror/wiki
 - [x] custom suffix support
 - [x] advanced settings
 - [x] driver settings
-
-
-### To do:
-
 - [ ] remember the min and max range of a shape key
 - [ ] copy the driver F-Curve
 - [ ] copy the driver F-Curve modifiers
