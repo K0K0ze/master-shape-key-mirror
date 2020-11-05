@@ -3,6 +3,9 @@ A add-on for Blender that helps with the mirroring of shape keys. Drivers are no
 
 Read the <a href="https://github.com/K0K0ze/master-shape-key-mirror/wiki ">wiki</a>
 
+### High Priority To do:
+- [ ] Object and Mesh musn't need the same name
+
 ### To do:
 
 - [x] mirror operator
